@@ -12,7 +12,7 @@ twitter_api = tweepy.API(auth)
 
 
 def get_day_ahead():
-    tomorrow = (pd.Timestamp.today(tz='Europe/Brussels') + pd.Timedelta(days=1)).normalize()
+    tomorrow = (pd.Timestamp.today().tz_localize('UTC').tz_convert(tz='Europe/Brussels') + pd.Timedelta(days=1)).normalize()
     client = Entsoe(api_key=entsoe_api_key)
     day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + pd.Timedelta(days=1),
                                    as_series=True)

@@ -2,6 +2,7 @@ from time import sleep
 import pandas as pd
 from entsoe import Entsoe
 import tweepy
+import datetime as dt
 
 from settings import entsoe_api_key, twitter_key, twitter_secret, twitter_token, twitter_token_secret, log_account
 
@@ -12,9 +13,9 @@ twitter_api = tweepy.API(auth)
 
 
 def get_day_ahead():
-    tomorrow = (pd.Timestamp.today().tz_localize('UTC').tz_convert(tz='Europe/Brussels') + pd.Timedelta(days=1)).normalize()
+    tomorrow = (pd.Timestamp.today().tz_localize('UTC').tz_convert(tz='Europe/Brussels') + dt.timedelta(days=1)).normalize()
     client = Entsoe(api_key=entsoe_api_key)
-    day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + pd.Timedelta(days=1),
+    day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + dt.timedelta(days=1),
                                    as_series=True)
     day_ahead = day_ahead.tz_convert('Europe/Brussels')
     return day_ahead
@@ -38,7 +39,7 @@ def tweetgen(negatives):
             time.strftime('%-d %b'),
             str(val).replace('.', ','),
             time.strftime('%-H'),
-            (time + pd.Timedelta(hours=1)).strftime('%-H')
+            (time + dt.timedelta(hours=1)).strftime('%-H')
         )
         yield tweet
 

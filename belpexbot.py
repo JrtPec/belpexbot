@@ -13,11 +13,12 @@ twitter_api = tweepy.API(auth)
 
 
 def get_day_ahead():
-    tomorrow = (pd.Timestamp.today().tz_localize('UTC').tz_convert(tz='Europe/Brussels') + dt.timedelta(days=1)).normalize()
+    tomorrow = (pd.Timestamp.utcnow().tz_convert(tz='Europe/Brussels') + dt.timedelta(days=1)).replace(hour=0)
     client = Entsoe(api_key=entsoe_api_key)
     day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + dt.timedelta(days=1),
                                    as_series=True)
-    day_ahead = day_ahead.tz_convert('Europe/Brussels')
+    if day_ahead is not None:
+        day_ahead = day_ahead.tz_convert('Europe/Brussels')
     return day_ahead
 
 

@@ -53,7 +53,7 @@ def tweetgen(negatives):
 
 
 def run():
-    while True:
+    for _ in range(72):
         print('Getting day ahead prices...')
         day_ahead = get_day_ahead()
         if day_ahead is not None:

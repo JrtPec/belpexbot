@@ -9,7 +9,7 @@ from settings import entsoe_api_key, twitter_key, twitter_secret, twitter_token,
 auth = tweepy.OAuthHandler(twitter_key, twitter_secret)
 auth.set_access_token(twitter_token, twitter_token_secret)
 
-twitter_api = tweepy.API(auth)
+twitter_api = tweepy.API(auth, retry_count=5, retry_delay=60)
 
 
 def get_day_ahead():

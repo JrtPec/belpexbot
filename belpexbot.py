@@ -3,6 +3,7 @@ import pandas as pd
 from entsoe import Entsoe
 import tweepy
 import datetime as dt
+from requests.exceptions import HTTPError
 
 from settings import entsoe_api_key, twitter_key, twitter_secret, twitter_token, twitter_token_secret, log_account
 
@@ -15,8 +16,14 @@ twitter_api = tweepy.API(auth, retry_count=72, retry_delay=600)
 def get_day_ahead():
     tomorrow = (pd.Timestamp.utcnow().tz_convert(tz='Europe/Brussels') + dt.timedelta(days=1)).replace(hour=0)
     client = Entsoe(api_key=entsoe_api_key, retry_count=72, retry_delay=600)
-    day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + dt.timedelta(days=1),
-                                   as_series=True)
+    try:
+        day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + dt.timedelta(days=1),
+                                    as_series=True)
+    except HTTPError as e:
+        tweet = "Looks like I'm unable to get the day-ahead prices from #ENTSO-E today. Sorry!"
+        send_tweet(tweet)
+        raise e
+
     if day_ahead is not None:
         day_ahead = day_ahead.tz_convert('Europe/Brussels')
     return day_ahead

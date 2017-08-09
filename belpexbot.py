@@ -9,12 +9,12 @@ from settings import entsoe_api_key, twitter_key, twitter_secret, twitter_token,
 auth = tweepy.OAuthHandler(twitter_key, twitter_secret)
 auth.set_access_token(twitter_token, twitter_token_secret)
 
-twitter_api = tweepy.API(auth, retry_count=5, retry_delay=60)
+twitter_api = tweepy.API(auth, retry_count=72, retry_delay=600)
 
 
 def get_day_ahead():
     tomorrow = (pd.Timestamp.utcnow().tz_convert(tz='Europe/Brussels') + dt.timedelta(days=1)).replace(hour=0)
-    client = Entsoe(api_key=entsoe_api_key)
+    client = Entsoe(api_key=entsoe_api_key, retry_count=72, retry_delay=600)
     day_ahead = client.query_price(country_code='BE', start=tomorrow, end=tomorrow + dt.timedelta(days=1),
                                    as_series=True)
     if day_ahead is not None:

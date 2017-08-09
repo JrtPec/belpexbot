@@ -36,9 +36,9 @@ def send_tweet(tweet):
 
 def tweetgen(negatives):
     for time, val in negatives.iteritems():
-        tweet = "Tomorrow ({}) negative electricity prices: {} €/MWh from {} to {}h! #BelPEX".format(
-            time.strftime('%-d %b'),
+        tweet = "Negative electricity price alert!\n{} €/MWh\nTomorrow ({})\nfrom {}h to {}h\n#BelPex".format(
             str(val).replace('.', ','),
+            time.strftime('%-d %b'),
             time.strftime('%-H'),
             (time + dt.timedelta(hours=1)).strftime('%-H')
         )
@@ -47,14 +47,19 @@ def tweetgen(negatives):
 
 def run():
     while True:
+        print('Getting day ahead prices...')
         day_ahead = get_day_ahead()
         if day_ahead is not None:
+            print('Succes! Sending Direct Tweet...')
             send_success_dm()
             break
         else:
+            print('No prices found, sleeping for 10 minutes')
             sleep(600)
 
     negatives = day_ahead[day_ahead < 0]
+    if not negatives.empty:
+        print('Negative values found! Preparing tweets...')
 
     tweets = tweetgen(negatives)
 
